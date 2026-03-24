@@ -27,7 +27,7 @@
                     <button id="disconnectBleButton" class="disconnectButton"> Disconnect BLE Device</button>
                 </p>
                 <p class="gray-label">BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
-				<button id="offButton" class="offButton">OFF</button>
+				<button id="offButton" class="offButton">All OFF</button>
             </div>
         </div>
         <div class="card-grid">
@@ -39,22 +39,22 @@
 
             <div class="card">
                 <h2>Knight Rider</h2>
-                <button id="onButton" class="onButton">ON</button>
-                <button id="offButton" class="offButton">OFF</button>
-                <p class="gray-label">Last value sent: <span id="valueSent"></span></p>
+                <button id="knightRiderButton" class="onButton">ON</button>
+            </div>
+			<div class="card">
+                <h2>Red Flash</h2>
+                <button id="redFlashButton" class="onButton">ON</button>
             </div>
         </div>
     </div>
-    <div class="footer">
-        <p><a href="https://randomnerdtutorials.com/">Created by RandomNerdTutorials.com</a></p>
-        <p><a href="https://RandomNerdTutorials.com/esp32-web-bluetooth/">Read the full project here.</a></p>
-    </div>
+    
 </body>
 <script>
     // DOM Elements
     const connectButton = document.getElementById('connectBleButton');
     const disconnectButton = document.getElementById('disconnectBleButton');
-    const onButton = document.getElementById('onButton');
+    const knightRiderButton = document.getElementById('knightRiderButton');
+    const redFlashButton = document.getElementById('redFlashButton');
     const offButton = document.getElementById('offButton');
     const retrievedValue = document.getElementById('valueContainer');
     const latestValueSent = document.getElementById('valueSent');
@@ -83,8 +83,10 @@
     disconnectButton.addEventListener('click', disconnectDevice);
 
     // Write to the ESP32 LED Characteristic
-    onButton.addEventListener('click', () => writeOnCharacteristic(1));
-    offButton.addEventListener('click', () => writeOnCharacteristic(0));
+	offButton.addEventListener('click', () => writeOnCharacteristic(0));
+    knightRiderButton.addEventListener('click', () => writeOnCharacteristic(1));
+    redFlashButton.addEventListener('click', () => writeOnCharacteristic(2));
+    
 
     // Check if BLE is available in your Browser
     function isWebBluetoothEnabled() {
