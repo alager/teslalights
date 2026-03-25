@@ -49,6 +49,14 @@
                 <h2>PoPo Mode</h2>
                 <button id="popoModeButton" class="onButton">ON</button>
             </div>
+			<div class="card">
+                <h2>Yellow Flash</h2>
+                <button id="yellowFlashButton" class="onButton">ON</button>
+            </div>
+			<div class="card">
+                <h2>Red Breathing</h2>
+                <button id="redBreathingButton" class="onButton">ON</button>
+            </div>
         </div>
     </div>
     
@@ -60,6 +68,8 @@
     const knightRiderButton = document.getElementById('knightRiderButton');
     const redFlashButton = document.getElementById('redFlashButton');
     const popoModeButton = document.getElementById('popoModeButton');
+    const yellowFlashButton = document.getElementById('yellowFlashButton');
+    const redBreathingButton = document.getElementById('redBreathingButton');
     const offButton = document.getElementById('offButton');
     const retrievedValue = document.getElementById('valueContainer');
     const latestValueSent = document.getElementById('valueSent');
@@ -92,6 +102,8 @@
     knightRiderButton.addEventListener('click', () => writeOnCharacteristic(1));
     redFlashButton.addEventListener('click', () => writeOnCharacteristic(2));
 	popoModeButton.addEventListener('click', () => writeOnCharacteristic(3));
+	yellowFlashButton.addEventListener('click', () => writeOnCharacteristic(4));
+	redBreathingButton.addEventListener('click', () => writeOnCharacteristic(5));
     
 
     // Check if BLE is available in your Browser
