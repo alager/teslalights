@@ -45,6 +45,10 @@
                 <h2>Red Flash</h2>
                 <button id="redFlashButton" class="onButton">ON</button>
             </div>
+			<div class="card">
+                <h2>PoPo Mode</h2>
+                <button id="popoModeButton" class="onButton">ON</button>
+            </div>
         </div>
     </div>
     
@@ -55,6 +59,7 @@
     const disconnectButton = document.getElementById('disconnectBleButton');
     const knightRiderButton = document.getElementById('knightRiderButton');
     const redFlashButton = document.getElementById('redFlashButton');
+    const popoModeButton = document.getElementById('popoModeButton');
     const offButton = document.getElementById('offButton');
     const retrievedValue = document.getElementById('valueContainer');
     const latestValueSent = document.getElementById('valueSent');
@@ -86,6 +91,7 @@
 	offButton.addEventListener('click', () => writeOnCharacteristic(0));
     knightRiderButton.addEventListener('click', () => writeOnCharacteristic(1));
     redFlashButton.addEventListener('click', () => writeOnCharacteristic(2));
+	popoModeButton.addEventListener('click', () => writeOnCharacteristic(3));
     
 
     // Check if BLE is available in your Browser
