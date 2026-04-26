@@ -77,10 +77,10 @@
     const timestampContainer = document.getElementById('timestamp');
 
     //Define BLE Device Specs
-    var deviceName ='LED';
-    var bleService = '19b10000-e8f2-537e-4f6c-d104768a1214';
-    var ledCharacteristic = '19b10002-e8f2-537e-4f6c-d104768a1214';
-    var sensorCharacteristic= '19b10001-e8f2-537e-4f6c-d104768a1214';
+    const deviceName =			'Tesla Lights';
+    const bleService = 			'19b10000-e8f2-537e-4f6c-d104768a1214';
+    const ledCharacteristic = 	'19b10002-e8f2-537e-4f6c-d104768a1214';
+    const sensorCharacteristic= '19b10001-e8f2-537e-4f6c-d104768a1214';
 
     //Global Variables to Handle Bluetooth
     var bleServer;
@@ -172,7 +172,7 @@
         const newValueReceived = new TextDecoder().decode(event.target.value);
         console.log("Characteristic value changed: ", newValueReceived);
         retrievedValue.innerHTML = newValueReceived;
-        timestampContainer.innerHTML = getDateTime();
+        // timestampContainer.innerHTML = getDateTime();
     }
 
     function writeOnCharacteristic(value){
@@ -224,18 +224,18 @@
         }
     }
 
-    function getDateTime() {
-        var currentdate = new Date();
-        var day = ("00" + currentdate.getDate()).slice(-2); // Convert day to string and slice
-        var month = ("00" + (currentdate.getMonth() + 1)).slice(-2);
-        var year = currentdate.getFullYear();
-        var hours = ("00" + currentdate.getHours()).slice(-2);
-        var minutes = ("00" + currentdate.getMinutes()).slice(-2);
-        var seconds = ("00" + currentdate.getSeconds()).slice(-2);
+    // function getDateTime() {
+    //     var currentdate = new Date();
+    //     var day = ("00" + currentdate.getDate()).slice(-2); // Convert day to string and slice
+    //     var month = ("00" + (currentdate.getMonth() + 1)).slice(-2);
+    //     var year = currentdate.getFullYear();
+    //     var hours = ("00" + currentdate.getHours()).slice(-2);
+    //     var minutes = ("00" + currentdate.getMinutes()).slice(-2);
+    //     var seconds = ("00" + currentdate.getSeconds()).slice(-2);
 
-        var datetime = day + "/" + month + "/" + year + " at " + hours + ":" + minutes + ":" + seconds;
-        return datetime;
-    }
+    //     var datetime = day + "/" + month + "/" + year + " at " + hours + ":" + minutes + ":" + seconds;
+    //     return datetime;
+    // }
 
 
 </script>
