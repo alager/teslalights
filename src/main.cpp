@@ -131,12 +131,10 @@ void lightLoop( u_int8_t stripMode )
 	else if (stripMode == 1)
 	{
 		// knight rider
-		#define KNIGHT_RIDER_CYCLES (1)
 		#define KNIGHT_RIDER_SPEED (32)
 		#define KNIGHT_RIDER_WIDTH (7)
 		#define KNIGHT_RIDER_COLOR (0xFF1000) // original orange-red
 
-		// knightRider(KNIGHT_RIDER_CYCLES, KNIGHT_RIDER_SPEED, KNIGHT_RIDER_WIDTH, KNIGHT_RIDER_COLOR); // Cycles, Speed, Width, RGB Color (original orange-red)
 		knightRider( KNIGHT_RIDER_SPEED, KNIGHT_RIDER_WIDTH, KNIGHT_RIDER_COLOR); // Cycles, Speed, Width, RGB Color (original orange-red)
 		clearStrip();																				  // Clear strip after pattern completes
 	}
@@ -170,6 +168,10 @@ void lightLoop( u_int8_t stripMode )
 	}
 	else if (stripMode == 5)
 	{
+		unsigned long previousMillis = 0;		// Stores last time the action was performed
+		unsigned long currentMillis = millis(); // Get the current time
+		previousMillis = currentMillis;			// initial the timer
+
 		#define BREATH_MIN_BRIGHTNESS (20)
 		#define BREATH_MAX_BRIGHTNESS (255)
 		#define BREATHING_DELAY (5)
@@ -179,36 +181,121 @@ void lightLoop( u_int8_t stripMode )
 		{
 			strip.fill(strip.Color(strip.gamma8(brightness), 0, 0)); // Red color with varying brightness
 			strip.show();
-			delay(BREATHING_DELAY);
+			
+			// allow BLE processing while waiting for the next pixel update
+			BLE.poll();
+
+			// delay(BREATHING_DELAY);
+			// non BLE blocking delay
+			while (true)
+			{
+				if (currentMillis - previousMillis < BREATHING_DELAY)
+				{
+					currentMillis = millis(); // Get the current time
+					BLE.poll();				  // allow BLE processing while waiting for the next pixel update
+				}
+				else
+				{
+					previousMillis = currentMillis;
+					break; // exit the loop after the wait time has elapsed
+				}
+			}
 		}
+		
 		for (uint8_t brightness = BREATH_MAX_BRIGHTNESS; brightness > BREATH_MIN_BRIGHTNESS; brightness--)
 		{
 			strip.fill(strip.Color(strip.gamma8(brightness), 0, 0)); // Red color with varying brightness
 			strip.show();
-			delay(BREATHING_DELAY);
+			
+			// allow BLE processing while waiting for the next pixel update
+			BLE.poll();
+
+			// delay(BREATHING_DELAY);
+			// non BLE blocking delay
+			while (true)
+			{
+				if (currentMillis - previousMillis < BREATHING_DELAY)
+				{
+					currentMillis = millis(); // Get the current time
+					BLE.poll();				  // allow BLE processing while waiting for the next pixel update
+				}
+				else
+				{
+					break; // exit the loop after the wait time has elapsed
+				}
+			}
 		}
 	}
-
-	// delay(100); // 100ms delay to allow BLE processing and prevent overwhelming the stack
 }
 
 // flash the strip
-void flash(uint32_t color, int wait)
+void flash(uint32_t color, uint16_t wait)
 {
+	unsigned long previousMillis = 0; // Stores last time the action was performed
+	unsigned long currentMillis = millis(); // Get the current time
+	previousMillis = currentMillis;	// initial the timer
+
 	strip.fill(color);
 	strip.show();
-	delay(wait);
-	strip.clear();
-	strip.show();
-	delay(wait);
+
+	// non BLE blocking delay
+	while(true)
+	{
+		if (currentMillis - previousMillis < wait)
+		{
+			currentMillis = millis(); // Get the current time
+			BLE.poll(); // allow BLE processing while waiting for the next pixel update
+		}
+		else
+		{
+			break; // exit the loop after the wait time has elapsed
+		}	
+	}
+		
+		strip.clear();
+		strip.show();
+
+		// non BLE blocking delay
+		currentMillis = millis(); // Get the current time
+		previousMillis = currentMillis; // initial the timer
+		while (true)
+		{
+			if (currentMillis - previousMillis < wait)
+			{
+				currentMillis = millis(); // Get the current time
+				BLE.poll();				  // allow BLE processing while waiting for the next pixel update
+			}
+			else
+			{
+				break; // exit the loop after the wait time has elapsed
+			}
+		}
 }
 
-void popoFlash(uint32_t color1, uint32_t color2, int wait)
+void popoFlash(uint32_t color1, uint32_t color2, uint16_t wait)
 {
+	unsigned long previousMillis = 0;		// Stores last time the action was performed
+	unsigned long currentMillis = millis(); // Get the current time
+	previousMillis = currentMillis;			// initial the timer
+
 	strip.fill( color1, 0, NUM_PIXELS/2);
 	strip.fill( color2, NUM_PIXELS/2, NUM_PIXELS/2);
 	strip.show();
-	delay(wait);
+	// delay(wait);
+
+	// non BLE blocking delay
+	while (true)
+	{
+		if (currentMillis - previousMillis < wait)
+		{
+			currentMillis = millis(); // Get the current time
+			BLE.poll();				  // allow BLE processing while waiting for the next pixel update
+		}
+		else
+		{
+			break; // exit the loop after the wait time has elapsed
+		}
+	}
 }
 
 
@@ -218,70 +305,63 @@ void popoFlash(uint32_t color1, uint32_t color2, int wait)
 //         light bulbs, so they have a persistance when turning off.  This creates a trail.
 //         Effective range is 2 - 8, 4 is default for 16 pixels.  Play with this.
 // Color - 32-bit packed RGB color value.  All pixels will be this color.
-// knightRider(cycles, speed, width, color);
-// void knightRider(uint16_t cycles, uint16_t speed, uint8_t width, uint32_t color)
+// knightRider(speed, width, color);
 void knightRider( uint16_t speed, uint8_t width, uint32_t color)
 {
 	uint32_t old_val[NUM_PIXELS];		// up to 256 lights!
 	unsigned long previousMillis = 0;	// Stores last time the action was performed
+	unsigned long currentMillis = millis(); // Get the current time
+	previousMillis = currentMillis;		// initial the timer
 
-	// Larson time baby!
-	// for(uint16_t i = 0; i < cycles; i++)
-	// {
-		// Serial.println("cycles: " + String(cycles));
-		for (uint16_t count = 0; count < NUM_PIXELS-1; ) 
+	for (uint16_t count = 0; count < NUM_PIXELS-1; ) 
+	{
+		currentMillis = millis(); // Get the current time
+
+		// allow BLE processing while waiting for the next pixel update
+		BLE.poll();
+
+		if (currentMillis - previousMillis >= speed)
 		{
-			unsigned long currentMillis = millis(); // Get the current time
+			// Save the last time you performed the action
+			previousMillis = currentMillis;
 
-			// allow BLE processing while waiting for the next pixel update
-			BLE.poll();
+			// increment the loop counter when we do a loop
+			count++;
 
-			if (currentMillis - previousMillis >= speed)
+			strip.setPixelColor(count, color);
+			old_val[count] = color;
+			for (int16_t x = count; x > 0; x--)
 			{
-				// Save the last time you performed the action
-				previousMillis = currentMillis;
-
-				// Serial.println("count up: " + String(count));
-				// increment the loop counter when we do a loop
-				count++;
-
-				strip.setPixelColor(count, color);
-				old_val[count] = color;
-				for (int16_t x = count; x > 0; x--)
-				{
-					old_val[x - 1] = dimColor(old_val[x - 1], width);
-					strip.setPixelColor(x - 1, old_val[x - 1]);
-				}
-				strip.show();
+				old_val[x - 1] = dimColor(old_val[x - 1], width);
+				strip.setPixelColor(x - 1, old_val[x - 1]);
 			}
+			strip.show();
 		}
+	}
 
-		for (int count = NUM_PIXELS-1; count > 0; ) 
+	for (int count = NUM_PIXELS-1; count > 0; ) 
+	{
+		currentMillis = millis(); // Get the current time
+
+		// allow BLE processing while waiting for the next pixel update
+		BLE.poll();
+
+		if (currentMillis - previousMillis >= speed)
 		{
-			unsigned long currentMillis = millis(); // Get the current time
+			// decrement the loop counter when we do a loop
+			count--;
 
-			// allow BLE processing while waiting for the next pixel update
-			BLE.poll();
+			strip.setPixelColor(count, color);
+			old_val[count] = color;
 
-			if (currentMillis - previousMillis >= speed)
+			for (uint16_t x = count; x <= NUM_PIXELS; x++)
 			{
-
-				// Serial.println("count down: " + String(count));
-				// decrement the loop counter when we do a loop
-				count--;
-
-				strip.setPixelColor(count, color);
-				old_val[count] = color;
-
-				for (uint16_t x = count; x <= NUM_PIXELS; x++)
-				{
-					old_val[x - 1] = dimColor(old_val[x - 1], width);
-					strip.setPixelColor(x + 1, old_val[x + 1]);
-				}
-				strip.show();
+				old_val[x - 1] = dimColor(old_val[x - 1], width);
+				strip.setPixelColor(x + 1, old_val[x + 1]);
 			}
+			strip.show();
 		}
-	// }
+	}
 }
 
 
