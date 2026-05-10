@@ -201,7 +201,7 @@ void lightLoop( u_int8_t stripMode )
 				}
 			}
 		}
-		
+
 		for (uint8_t brightness = BREATH_MAX_BRIGHTNESS; brightness > BREATH_MIN_BRIGHTNESS; brightness--)
 		{
 			strip.fill(strip.Color(strip.gamma8(brightness), 0, 0)); // Red color with varying brightness
@@ -348,6 +348,9 @@ void knightRider( uint16_t speed, uint8_t width, uint32_t color)
 
 		if (currentMillis - previousMillis >= speed)
 		{
+			// Save the last time you performed the action
+			previousMillis = currentMillis;
+			
 			// decrement the loop counter when we do a loop
 			count--;
 
